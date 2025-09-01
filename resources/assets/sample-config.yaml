@@ -18,6 +18,11 @@ general:
   # workspace when focusing the current workspace.
   toggle_workspace_on_refocus: false
 
+  # GlazeWM can center floating windows by default when connecting/disconnecting
+  # devices (e.g., USB). Set it to true to prevent this behavior (e.g., because
+  # you always use the same display).
+  prevent_centering_of_floating_windows: false
+
   cursor_jump:
     # Whether to automatically move the cursor on the specified trigger.
     enabled: true

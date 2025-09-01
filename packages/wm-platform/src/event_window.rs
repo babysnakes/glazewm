@@ -239,8 +239,7 @@ fn handle_display_change_msg(
       wparam.0 as u32 == SPI_SETWORKAREA.0
         || wparam.0 as u32 == SPI_ICONVERTICALSPACING.0
     }
-    // WM_DEVICECHANGE => wparam.0 as u32 == DBT_DEVNODES_CHANGED,
-    WM_DEVICECHANGE => false,
+    WM_DEVICECHANGE => wparam.0 as u32 == DBT_DEVNODES_CHANGED,
     _ => true,
   };
 

@@ -1,5 +1,5 @@
 use anyhow::Context;
-use tracing::info;
+use tracing::{debug, info};
 use wm_platform::Platform;
 
 use crate::{
@@ -116,6 +116,10 @@ pub fn handle_display_settings_changed(
     // all windows as needing a DPI adjustment (just in case).
     window.set_has_pending_dpi_adjustment(true);
 
+    if config.value.general.prevent_centering_of_floating_windows {
+      debug!("UserConfig prevented centering of window {}.", window);
+      continue;
+    }
     // Need to update floating position of moved windows when a monitor is
     // disconnected or if the primary display is changed. The primary
     // display dictates the position of 0,0.
