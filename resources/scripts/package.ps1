@@ -82,7 +82,7 @@ function BuildExes() {
     $sourceDir = "target/$target/release"
 
     Write-Output "Building for $target"
-    cargo build --locked --release --target $target --features ui_access
+    cargo build --locked --release --target $target #--features ui_access
 
     Write-Output "Moving built executables to $outDir"
     New-Item -ItemType Directory -Force -Path $outDir
