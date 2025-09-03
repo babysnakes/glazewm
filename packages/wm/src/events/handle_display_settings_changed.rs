@@ -1,5 +1,6 @@
 use anyhow::Context;
 use tracing::{debug, info};
+use wm_common::Rect;
 use wm_platform::Platform;
 
 use crate::{
@@ -116,19 +117,21 @@ pub fn handle_display_settings_changed(
     // all windows as needing a DPI adjustment (just in case).
     window.set_has_pending_dpi_adjustment(true);
 
-    if config.value.general.prevent_centering_of_floating_windows {
-      debug!("UserConfig prevented centering of window {}.", window);
-      continue;
-    }
     // Need to update floating position of moved windows when a monitor is
     // disconnected or if the primary display is changed. The primary
     // display dictates the position of 0,0.
     let workspace = window.workspace().context("No workspace.")?;
-    window.set_floating_placement(
-      window
-        .floating_placement()
-        .translate_to_center(&workspace.to_rect()?),
-    );
+    let workspace_rect = workspace.to_rect()?;
+    let floating_placement = window.floating_placement();
+    let new_placement =
+      if config.value.general.prevent_centering_of_floating_windows {
+        only_move_off_screen_windows(&workspace_rect, &floating_placement)
+      } else {
+        Some(floating_placement.translate_to_center(&workspace_rect))
+      };
+    if let Some(placement) = new_placement {
+      window.set_floating_placement(placement);
+    }
   }
 
   // Redraw full container tree.
@@ -137,4 +140,17 @@ pub fn handle_display_settings_changed(
     .queue_container_to_redraw(state.root_container.clone());
 
   Ok(())
+}
+
+fn only_move_off_screen_windows(workspace_rect: &Rect, floating_placement: &Rect) -> Option<Rect> {
+  if floating_placement.x() > workspace_rect.width()
+      || floating_placement.y() > workspace_rect.height()
+  {
+    Some(floating_placement.translate_to_coordinates(
+      floating_placement.x() % workspace_rect.width(),
+      floating_placement.y() % workspace_rect.height(),
+    ))
+  } else {
+    None
+  }
 }
