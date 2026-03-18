@@ -347,9 +347,18 @@ pub struct InvokeFocusCommand {
 }
 
 #[derive(Args, Clone, Debug, PartialEq, Serialize)]
+pub struct InvokeMoveCommand {
+  #[clap(long, requires = "direction")]
+  pub distance: Option<LengthValue>,
+
+  #[clap(flatten)]
+  pub move_types: InvokeMoveCommandType,
+}
+
+#[derive(Args, Clone, Debug, PartialEq, Serialize)]
 #[group(required = true, multiple = false)]
 #[allow(clippy::struct_excessive_bools)]
-pub struct InvokeMoveCommand {
+pub struct InvokeMoveCommandType {
   /// Direction to move the window.
   #[clap(long)]
   pub direction: Option<Direction>,
@@ -385,7 +394,6 @@ pub struct InvokeMoveCommand {
 }
 
 #[derive(Args, Clone, Debug, PartialEq, Serialize)]
-#[group(required = true, multiple = true)]
 pub struct InvokeResizeCommand {
   #[clap(long, allow_hyphen_values = true)]
   pub width: Option<LengthValue>,
